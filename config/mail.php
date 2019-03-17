@@ -2,6 +2,8 @@
 
 return [
 
+    'supportEmail' => 'philip_plencner@harvard.edu',
+
     /*
     |--------------------------------------------------------------------------
     | Mail Driver
