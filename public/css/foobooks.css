@@ -1,0 +1,8 @@
+#logo {
+    /* Actual width is 632; displaying at half-size for retina screens */
+    width: 316px;
+}
+
+h1 {
+    font-family: "Helvetica", sans-serif;
+}
