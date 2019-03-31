@@ -11,7 +11,16 @@
 |
 */
 
+/*
+ * Misc "static" pages
+ */
 Route::view('/', 'welcome');
+Route::view('/about', 'about');
+Route::view('/contact', 'contact');
+
+/*
+ * Books
+ */
 Route::get('/books', 'BookController@index');
 Route::get('/books/{title}', 'BookController@show');
 

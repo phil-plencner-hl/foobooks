@@ -2,6 +2,16 @@
 
 return [
 
+    'githubUrl' => 'https://github.com/phil-plencner-hl/foobooks',
+
+    'nav' => [
+        // URL => Link label
+        'books' => 'Books',
+        'practice' => 'Practice',
+        'about' => 'About',
+        'contact' => 'Contact',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
