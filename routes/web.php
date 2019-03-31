@@ -21,6 +21,16 @@ Route::view('/contact', 'contact');
 /*
  * Books
  */
+
+Route::get('/books/create', 'BookController@create');
+Route::post('/books', 'BookController@store');
+
+# Show the search form
+Route::get('/books/search', 'BookController@search');
+
+# Processing the search form
+Route::get('/books/search-process', 'BookController@searchProcess');
+
 Route::get('/books', 'BookController@index');
 Route::get('/books/{title}', 'BookController@show');
 
