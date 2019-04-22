@@ -26,7 +26,7 @@ class PracticeController extends Controller
     {
         #Find any books by the author “J.K. Rowling” and update the author name to be “JK Rowling”
         # First get a book to update
-        $books = Book::where('author', '=', 'J.K. Rowling')->update(['author' => 'JK Rowling']);;
+        $books = Book::where('author', '=', 'J.K. Rowling')->update(['author' => 'JK Rowling']);
         dump('Update complete; check the database to confirm the update worked.');
     }
 
