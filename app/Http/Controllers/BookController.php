@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App;
+use App\Book;
 
 class BookController extends Controller
 {
@@ -12,16 +13,33 @@ class BookController extends Controller
      */
     public function index()
     {
-        return view('books.index');
+        //$newBooks = Book::latest()->limit(3)->get();
+
+        $books = Book::orderBy('title')->get();
+
+        $newBooks = $books->sortByDesc('created_at')->take(3);
+
+        return view('books.index')->with([
+            'books' => $books,
+            'newBooks' => $newBooks,
+        ]);
     }
 
     /*
-     * GET /books/{title}
+     * GET /books/{id}
      */
-    public function show($title)
+    public function show($id)
     {
+       $book = Book::find($id);
+
+        if (!$book) {
+            return redirect('/books')->with([
+            'alert' => 'The book you were looking for was not found.',
+            ]);
+        }
+
         return view('books.show')->with([
-            'title' => $title
+            'book' => $book
         ]);
     }
 
@@ -32,12 +50,12 @@ class BookController extends Controller
     {
         $searchTerm = $request->session()->get('searchTerm', '');
         $caseSensitive = $request->session()->get('caseSensitive', false);
-        $searchResults = $request->session()->get('searchResults', null);
+        $books = $request->session()->get('books', null);
 
         return view('books.search')->with([
             'searchTerm' => $searchTerm,
             'caseSensitive' => $caseSensitive,
-            'searchResults' => $searchResults,
+            'books' => $books,
         ]);
     }
 
@@ -59,30 +77,11 @@ class BookController extends Controller
 
         # Only try and search *if* there's a searchTerm
         if ($searchTerm) {
-            # Open the books.json data file
-            # database_path() is a Laravel helper to get the path to the database folder
-            # See https://laravel.com/docs/helpers for other path related helpers
-            $booksRawData = file_get_contents(database_path('/books.json'));
-
-            # Decode the book JSON data into an array
-            # Nothing fancy here; just a built in PHP method
-            $books = json_decode($booksRawData, true);
-
-            # Loop through all the book data, looking for matches
-            # This code was taken from v0 of foobooks we built earlier in the semester
-            foreach ($books as $title => $book) {
-                # Case sensitive boolean check for a match
-                if ($request->has('caseSensitive')) {
-                    $match = $title == $searchTerm;
-                    # Case insensitive boolean check for a match
-                } else {
-                    $match = strtolower($title) == strtolower($searchTerm);
-                }
-
-                # If it was a match, add it to our results
-                if ($match) {
-                    $searchResults[$title] = $book;
-                }
+            if ($request->has('caseSensitive')) {
+                $books = Book::whereRaw("BINARY title  = '$searchTerm' ")->get();
+            }
+            else {
+                $books = Book::where('title', '=', $searchTerm)->get();
             }
         }
 
@@ -91,7 +90,7 @@ class BookController extends Controller
         return redirect('/books/search')->with([
             'searchTerm' => $searchTerm,
             'caseSensitive' => $request->has('caseSensitive'),
-            'searchResults' => $searchResults
+            'books' => $books
         ]);
     }
 
@@ -121,8 +120,81 @@ class BookController extends Controller
         # Note: If validation fails, it will redirect the visitor back to the form page
         # and none of the code that follows will execute.
 
-        # Code will eventually go here to add the book to the database,
-        # but for now we'll just dump the form data to the page for proof of concept
-        dump($request->all());
+        $book = new Book();
+
+        # Set the properties
+        # Note how each property corresponds to a field in the table
+        $book->title = $request->title;
+        $book->author = $request->author;
+        $book->published_year = $request->published_year;
+        $book->cover_url = $request->cover_url;
+        $book->purchase_url = $request->purchase_url;
+
+        # Invoke the Eloquent `save` method to generate a new row in the
+        # `books` table, with the above data
+        $book->save();
+
+        return redirect('books/create')->with([
+            'alert' => 'The book '. $book->title .' was added.'
+        ]);
+    }
+
+    /*
+* GET /books/{id}/edit
+*/
+    public function edit($id)
+    {
+        $book = Book::find($id);
+
+        if (!$book) {
+            return redirect('/books')->with([
+                'alert' => 'The book you were looking for was not found.',
+            ]);
+        }
+
+        return view('books.edit')->with([
+            'book' => $book,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $book = Book::find($id);
+
+        # Set the properties
+        # Note how each property corresponds to a field in the table
+        $book->title = $request->title;
+        $book->author = $request->author;
+        $book->published_year = $request->published_year;
+        $book->cover_url = $request->cover_url;
+        $book->purchase_url = $request->purchase_url;
+
+        # Invoke the Eloquent `save` method to generate a new row in the
+        # `books` table, with the above data
+        $book->save();
+
+        return redirect('books/'.$id.'/edit')->with([
+            'alert' => 'Your changes were saved.'
+        ]);
+    }
+
+    /*
+    * DELETE /books/{id}
+    */
+    public function destroy($id)
+    {
+        $book = Book::find($id);
+
+        if (!$book) {
+            return redirect('/books')->with([
+                'alert' => 'The book you were looking for was not found.',
+            ]);
+        }
+
+        $book->delete();
+
+        return redirect('books')->with([
+            'alert' => 'The book '. $book->title .' was deleted.'
+        ]);
     }
 }

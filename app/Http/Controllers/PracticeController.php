@@ -11,6 +11,28 @@ class PracticeController extends Controller
     /**
      *
      */
+    public function practice16()
+    {
+        $books = Book::all();
+        echo $books;
+    }
+
+    /**
+     *
+     */
+    public function practice15()
+    {
+        $books = Book::all();
+        dump($books->toArray());
+        # loop through the Collection and access just the data
+        foreach ($books as $book) {
+            dump($book->title);
+        }
+    }
+
+    /**
+     *
+     */
     public function practice14()
     {
         #Remove any/all books with an author name that includes the string “Rowling”.
@@ -37,13 +59,7 @@ class PracticeController extends Controller
     {
         #Retrieve all the books in descending order according to published date.
         $books = Book::orderBy('published_year', 'desc')->get();
-        if ($books->isEmpty()) {
-            dump('No matches found');
-        } else {
-            foreach ($books as $book) {
-                dump($book->title);
-            }
-        }
+        Book::dump($books);
     }
 
     /**
@@ -53,13 +69,7 @@ class PracticeController extends Controller
     {
         #Retrieve all the books in alphabetical order by title.
         $books = Book::orderBy('title')->get();
-        if ($books->isEmpty()) {
-            dump('No matches found');
-        } else {
-            foreach ($books as $book) {
-                dump($book->title);
-            }
-        }
+        Book::dump($books);
     }
 
     /**
@@ -69,13 +79,7 @@ class PracticeController extends Controller
     {
         #Retrieve all the books published after 1950.
         $books = Book::where('published_year', '>', '1950')->get();
-        if ($books->isEmpty()) {
-            dump('No matches found');
-        } else {
-            foreach ($books as $book) {
-                dump($book->title);
-            }
-        }
+        Book::dump($books);
     }
 
     /**
@@ -85,13 +89,8 @@ class PracticeController extends Controller
     {
         # Retrieve the last 2 books that were added to the books table.
         $books = Book::orderBy('created_at', 'desc')->limit(2)->get();
-        if ($books->isEmpty()) {
-            dump('No matches found');
-        } else {
-            foreach ($books as $book) {
-                dump($book->title);
-            }
-        }
+
+        Book::dump($books);
     }
 
     /**

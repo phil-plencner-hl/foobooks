@@ -3,7 +3,7 @@
     width: 100%;
     margin-bottom: 20px;
     text-align: left;
-    border: 0;
+    border: 1px solid #eee;
 }
 
 .book h2 {
@@ -13,6 +13,10 @@
     text-align: left;
 }
 
+.book ul {
+    list-style-type: none;
+}
+
 .cover {
     float: left;
     width: 100px;
@@ -20,17 +24,4 @@
     background-color: #eee;
     border: 1px solid black;
     margin-right: 10px;
-}
-
-.bookActions {
-    list-style-type: none;
-}
-
-.bookActions li {
-    display: inline-block;
-}
-
-.bookActions li a {
-    text-decoration: none;
-    padding-right: 20px;
 }

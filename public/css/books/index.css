@@ -1,0 +1,12 @@
+section {
+    margin-bottom: 45px;
+}
+
+#newBooks {
+    background-color: lightyellow;
+    padding: 10px;
+}
+
+#newBooks ul {
+    list-style-type: none;
+}

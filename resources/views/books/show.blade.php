@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-    {{ $title }}
+    {{ $book->title }}
 @endsection
 
 @section('head')
@@ -10,17 +10,23 @@
 @endsection
 
 @section('content')
-    @if(isset($title))
-        <h1>{{ $title }}</h1>
+    <h1>{{ $book->title }}</h1>
 
-        <p>
-            Details about this book will go here...
-        </p>
-    @else
-        <p>
-            Book not found
-        </p>
-    @endif
+    <div class='book cf'>
+        <img src='{{ $book->cover_url }}' class='cover' alt='Cover image for {{ $book->title }}'>
+        <p>By {{ $book->author }} ({{ $book->published_year }})</p>
+        <p>Added {{ $book->created_at->format('m/d/y') }}</p>
+
+        <ul class='bookActions'>
+            <li><a href='{{ $book->purchase_url }}'><i class="fas fa-shopping-cart"></i> Purchase</a>
+            <li><a href='/books/{{ $book->id }}/edit'><i class="fas fa-edit"></i> Edit</a>
+        </ul>
+        <form method='POST' action='/books/{{ $book->id }}'>
+            {{ csrf_field() }}
+            {{ method_field('delete') }}
+            <input type='submit' class='btn btn-primary' value='Delete book'>
+        </form>
+    </div>
 @endsection
 
 
