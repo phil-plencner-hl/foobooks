@@ -14,7 +14,7 @@
 
     <div class='book cf'>
         <img src='{{ $book->cover_url }}' class='cover' alt='Cover image for {{ $book->title }}'>
-        <p>By {{ $book->author }} ({{ $book->published_year }})</p>
+        <p>By {{ $book->author->first_name . ' '. $book->author->last_name }} ({{ $book->published_year }})</p>
         <p>Added {{ $book->created_at->format('m/d/y') }}</p>
 
         <ul class='bookActions'>

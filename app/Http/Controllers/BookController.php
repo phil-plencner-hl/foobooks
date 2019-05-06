@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App;
 use App\Book;
+use App\Author;
+use App\Tag;
 
 class BookController extends Controller
 {
@@ -15,7 +17,7 @@ class BookController extends Controller
     {
         //$newBooks = Book::latest()->limit(3)->get();
 
-        $books = Book::orderBy('title')->get();
+        $books = Book::with('author')->orderBy('title')->get();
 
         $newBooks = $books->sortByDesc('created_at')->take(3);
 
@@ -99,7 +101,12 @@ class BookController extends Controller
      */
     public function create()
     {
-        return view('books.create');
+        $authors = Author::getForDropdown();
+        $tags = Tag::getForCheckboxes();
+        return view('books.create')->with([
+        'authors' => $authors,
+        'tags' => $tags,
+        ]);
     }
 
     /**
@@ -108,10 +115,11 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
+
         # Validate the request data
         $request->validate([
             'title' => 'required',
-            'author' => 'required',
+            'author_id' => 'required',
             'published_year' => 'required|digits:4',
             'cover_url' => 'required|url',
             'purchase_url' => 'required|url'
@@ -120,12 +128,11 @@ class BookController extends Controller
         # Note: If validation fails, it will redirect the visitor back to the form page
         # and none of the code that follows will execute.
 
-        $book = new Book();
-
         # Set the properties
         # Note how each property corresponds to a field in the table
+        $book = new Book();
         $book->title = $request->title;
-        $book->author = $request->author;
+        $book->author_id = $request->author_id;
         $book->published_year = $request->published_year;
         $book->cover_url = $request->cover_url;
         $book->purchase_url = $request->purchase_url;
@@ -133,6 +140,9 @@ class BookController extends Controller
         # Invoke the Eloquent `save` method to generate a new row in the
         # `books` table, with the above data
         $book->save();
+
+        # Note: Have to sync tags *after* the book has been saved so there's a book_id to store in the pivot table
+        $book->tags()->sync($request->tags);
 
         return redirect('books/create')->with([
             'alert' => 'The book '. $book->title .' was added.'
@@ -144,7 +154,11 @@ class BookController extends Controller
 */
     public function edit($id)
     {
+
         $book = Book::find($id);
+        $authors = Author::getForDropdown();
+        $tags = Tag::getForCheckboxes();
+        $bookTags = $book->tags->pluck('id')->toArray();
 
         if (!$book) {
             return redirect('/books')->with([
@@ -154,20 +168,33 @@ class BookController extends Controller
 
         return view('books.edit')->with([
             'book' => $book,
+            'authors' => $authors,
+            'tags' => $tags,
+            'bookTags' => $bookTags,
         ]);
     }
 
     public function update(Request $request, $id)
     {
-        $book = Book::find($id);
 
+        # Validate the request data
+        $request->validate([
+            'title' => 'required',
+            'author_id' => 'required',
+            'published_year' => 'required|digits:4',
+            'cover_url' => 'required|url',
+            'purchase_url' => 'required|url'
+        ]);
+
+        $book = Book::find($id);
         # Set the properties
         # Note how each property corresponds to a field in the table
         $book->title = $request->title;
-        $book->author = $request->author;
+        $book->author_id = $request->author_id;
         $book->published_year = $request->published_year;
         $book->cover_url = $request->cover_url;
         $book->purchase_url = $request->purchase_url;
+        $book->tags()->sync($request->tags);
 
         # Invoke the Eloquent `save` method to generate a new row in the
         # `books` table, with the above data
@@ -191,6 +218,7 @@ class BookController extends Controller
             ]);
         }
 
+        $book->tags()->detach();
         $book->delete();
 
         return redirect('books')->with([

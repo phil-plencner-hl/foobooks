@@ -16,9 +16,14 @@
         <input type='text' name='title' id='title' value='{{ old('title') }}'>
         @include('includes.error-field', ['fieldName' => 'title'])
 
-        <label for='author'>* Author</label>
-        <input type='text' name='author' id='author' value='{{ old('author') }}'>
-        @include('includes.error-field', ['fieldName' => 'author'])
+        <label for='author_id'>* Author</label>
+        <select name='author_id'>
+            <option value=''>Choose one...</option>
+            @foreach($authors as $author)
+            <option value='{{ $author->id }}' {{ (old('author_id') == $author->id) ? 'selected' : '' }}>{{ $author->last_name .', '. $author->first_name }}</option>
+            @endforeach
+        </select>
+        @include('includes.error-field', ['fieldName' => 'author_id'])
 
         <label for='published_year'>* Published Year (YYYY)</label>
         <input type='text' name='published_year' id='published_year' value='{{ old('published_year') }}'>
@@ -32,10 +37,23 @@
         <input type='text' name='purchase_url' id='purchase_url'  value='{{ old('purchase_url', 'http://') }}'>
         @include('includes.error-field', ['fieldName' => 'purchase_url'])
 
+        <label>Tags</label>
+        @foreach($tags as $tag)
+            <ul class='checkboxes'>
+                <li>
+                    <label>
+                        <input type='checkbox'
+                               name='tags[]'
+                               value='{{ $tag->id }}'> {{ $tag->name }}
+                    </label>
+                </li>
+            </ul>
+        @endforeach
+
         <input type='submit' class='btn btn-primary' value='Add book'>
     </form>
 
     @if(count($errors) > 0)
-        <div class='alert alert-danger'>Please fix the errors above.</div>
+        <div class=''>Please fix the errors above.</div>
     @endif
 @endsection
