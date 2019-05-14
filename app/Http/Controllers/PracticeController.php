@@ -6,9 +6,65 @@ use Illuminate\Http\Request;
 use IanLChapman\PigLatinTranslator\Parser;
 use App\Book;
 use App\Author;
+use App\Course;
+use App\Department;
 
 class PracticeController extends Controller
 {
+
+    /**
+     *
+     */
+    public function practice24()
+    {
+        $course = Course::where('name', '=', 'Dynamic Web Applications')->first();
+        //dump($course->name);
+        //dump($course);
+        //dump($course->toArray());
+        //dump($course->credits);
+        echo $course;
+    }
+    /**
+     *
+     */
+    public function practice23()
+    {
+        $course = Course::where('name', '=', 'Dynamic Web Applications')->first();
+        //dump($course->name);
+        //dump($course);
+        //dump($course->toArray());
+        //dump($course->credits);
+        echo $course;
+    }
+
+    /**
+     *
+     */
+    public function practice22()
+    {
+        $courses = Course::with('department')->get();
+
+        foreach($courses as $course) {
+
+            dump($course->department);
+
+        }
+    }
+
+    /**
+     *
+     */
+    public function practice21()
+    {
+        $courses = Course::all();
+
+        foreach($courses as $course) {
+
+            dump($course->department);
+
+        }
+    }
+
     /**
      *
      */
